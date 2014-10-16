@@ -13,16 +13,19 @@ HGE *hge = 0;
 HEFFECT		      snd;
 HTEXTURE          tex1;
 HTEXTURE          tex2;
+HTEXTURE          tex;
 hgeQuad           quad;
 
 person			*playerwalk;
 person			*playerstand;
 PERSON_STATE     walkorstand;
-
+map				*Game_Map;
+	
 // Pointers to the HGE objects we will use
 hgeGUI            *gui;
 hgeFont           *fnt;
 hgeSprite         *spr;
+hgeSprite         *pic;
 
 bool FrameFunc()
 {
@@ -76,6 +79,9 @@ bool RenderFunc()
 	hge->Gfx_BeginScene();
 	hge->Gfx_Clear(0);
 	fnt->printf(5, 5, HGETEXT_LEFT, "FPS:%d  x:%d  y:%d  walk=%d", hge->Timer_GetFPS(), playerwalk->getX(), playerwalk->getY(), int(walkorstand));
+	for(int i = 0; i < 20; i++)
+		for(int j = 0; j < 20; j++)
+			pic->Render(i * 40, j * 40);
 	if(walkorstand == STAND)
 		playerstand->Render();
 	else
@@ -99,11 +105,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	hge->System_SetState(HGE_SHOWSPLASH, false);
 	hge->System_SetState(HGE_USESOUND, false);
 
+	int Ini_Stage[BOX_NUM][BOX_NUM] = {{0}};
+	Game_Map = new map(hge, Ini_Stage);
+
 	if(hge->System_Initiate()){
-		int Ini_Stage[BOX_NUM][BOX_NUM] = {{0}};
-		map *Game_Map = new map(hge, Ini_Stage);
 		tex1 = hge->Texture_Load("walk.png");
 		tex2 = hge->Texture_Load("stand.png");
+		tex = hge->Texture_Load("wall1.png");	
+		pic = new hgeSprite(tex, 0, 0, BOX_WIDTH, BOX_LENGTH);
 		fnt = new hgeFont("font1.fnt");
 		playerwalk = new person(tex1, 4, 8, 100, 100);
 		playerstand = new person(tex2, 4, 8, 100, 100);
